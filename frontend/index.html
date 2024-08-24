@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptography Web App</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>Cryptography Web Application</h1>
+    <p class="centered-paragraph">
+        This Encryption Web App allows you to easily encrypt and decrypt text using classic cryptographic methods. Select a cipher (Caesar or Affine), enter your text and key, and choose whether to encrypt or decrypt. The user-friendly interface makes it simple to see the results instantly. This app is a great tool for understanding and experimenting with fundamental encryption techniques.
+    </p>
+
+
+    <form id="cipherForm">
+        <label for="cipher">Select Cipher:</label>
+        <select id="cipher">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="affine">Affine Cipher</option>
+        </select>
+
+        <label for="text">Text:</label>
+        <input type="text" id="text" placeholder="Enter text here">
+
+        <label for="key">Key:</label>
+        <input type="text" id="key" placeholder="Enter key here">
+
+        <button type="button" onclick="processCipher('encrypt')">Encrypt</button>
+        <button type="button" onclick="processCipher('decrypt')">Decrypt</button>
+    </form>
+
+    <h2>Result:</h2>
+    <p id="result"></p>
+</div>
+
+<script>
+    async function processCipher(action) {
+        const cipher = document.getElementById('cipher').value;
+        const text = document.getElementById('text').value;
+        const key = document.getElementById('key').value;
+
+        try {
+            const response = await fetch('/process?cipher=' + encodeURIComponent(cipher) + '&action=' + encodeURIComponent(action), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, key, cipher, action })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            document.getElementById('result').innerText = result.result || 'Error: ' + result.error;
+        } catch (error) {
+            console.error('There was a problem with the fetch operation:', error);
+            document.getElementById('result').innerText = 'Error: ' + error.message;
+        }
+    }
+</script>
+</body>
+</html>
